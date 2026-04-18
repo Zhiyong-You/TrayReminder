@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37111.16 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrayReminder", "TrayReminder.csproj", "{ED4F7711-8CC6-FCDA-555E-A6E663C03A95}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED4F7711-8CC6-FCDA-555E-A6E663C03A95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED4F7711-8CC6-FCDA-555E-A6E663C03A95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED4F7711-8CC6-FCDA-555E-A6E663C03A95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED4F7711-8CC6-FCDA-555E-A6E663C03A95}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {15A2350A-3B80-44A7-B92E-CD09D7710516}
+	EndGlobalSection
+EndGlobal
