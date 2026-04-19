@@ -10,22 +10,33 @@ public class MainViewModel
 
     public ObservableCollection<ReminderItem> Reminders { get; } = new();
 
-    // 将来: INotifyPropertyChanged, RelayCommand等を導入してバインディングを強化する
-
-    public void AddReminder()
+    public MainViewModel()
     {
-        // 将来: ダイアログ表示・入力受け付けをここで行う
-        var item = new ReminderItem
-        {
-            Title = "（新しいリマインダー）",
-            RemindAt = DateTime.Now.AddHours(1),
-        };
+        foreach (var item in _service.GetAll())
+            Reminders.Add(item);
+    }
+
+    public void AddReminder(ReminderItem item)
+    {
         _service.Add(item);
         Reminders.Add(item);
     }
 
-    public void SaveReminders()
+    public void UpdateReminder(ReminderItem item)
     {
-        // 将来: JSON等への永続化をここで行う
+        _service.Save();
+        // ObservableCollection は同一オブジェクトの内部変更を検知しないため再挿入で更新
+        var index = Reminders.IndexOf(item);
+        if (index >= 0)
+        {
+            Reminders.RemoveAt(index);
+            Reminders.Insert(index, item);
+        }
+    }
+
+    public void RemoveReminder(ReminderItem item)
+    {
+        _service.Remove(item.Id);
+        Reminders.Remove(item);
     }
 }
