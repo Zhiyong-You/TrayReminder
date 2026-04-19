@@ -1,0 +1,32 @@
+<Window x:Class="TrayReminder.Views.NotificationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="リマインダー通知"
+        Width="320" Height="190"
+        WindowStartupLocation="CenterScreen"
+        Topmost="True"
+        ResizeMode="NoResize">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" x:Name="TitleText"
+                   FontSize="15" FontWeight="Bold"
+                   TextWrapping="Wrap" Margin="0,0,0,4"/>
+
+        <TextBlock Grid.Row="1" x:Name="TimeText"
+                   Foreground="Gray" FontSize="12" Margin="0,0,0,6"/>
+
+        <TextBlock Grid.Row="2" x:Name="DescriptionText"
+                   TextWrapping="Wrap" FontSize="12" VerticalAlignment="Top"/>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button Content="完了" Width="80" Margin="0,0,8,0" Click="CompleteButton_Click"/>
+            <Button Content="閉じる" Width="80" Click="CloseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -27,4 +27,15 @@ public class ReminderService
     }
 
     public void Save() => _storage.Save(_items);
+
+    public void MarkCompleted(Guid id)
+    {
+        var item = _items.FirstOrDefault(x => x.Id == id);
+        if (item is null) return;
+        item.IsCompleted = true;
+        _storage.Save(_items);
+        ItemUpdated?.Invoke(id);
+    }
+
+    public event Action<Guid>? ItemUpdated;
 }

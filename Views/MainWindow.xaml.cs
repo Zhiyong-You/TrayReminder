@@ -1,16 +1,18 @@
 using System.Windows;
 using TrayReminder.Models;
+using TrayReminder.Services;
 using TrayReminder.ViewModels;
 
 namespace TrayReminder.Views;
 
 public partial class MainWindow : Window
 {
-    private readonly MainViewModel _viewModel = new();
+    private readonly MainViewModel _viewModel;
 
-    public MainWindow()
+    public MainWindow(ReminderService reminderService)
     {
         InitializeComponent();
+        _viewModel = new MainViewModel(reminderService);
         DataContext = _viewModel;
     }
 

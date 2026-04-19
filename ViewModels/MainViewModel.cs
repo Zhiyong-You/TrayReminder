@@ -6,12 +6,15 @@ namespace TrayReminder.ViewModels;
 
 public class MainViewModel
 {
-    private readonly ReminderService _service = new();
+    private readonly ReminderService _service;
 
     public ObservableCollection<ReminderItem> Reminders { get; } = new();
 
-    public MainViewModel()
+    public MainViewModel(ReminderService service)
     {
+        _service = service;
+        _service.ItemUpdated += OnItemUpdated;
+
         foreach (var item in _service.GetAll())
             Reminders.Add(item);
     }
@@ -25,7 +28,6 @@ public class MainViewModel
     public void UpdateReminder(ReminderItem item)
     {
         _service.Save();
-        // ObservableCollection は同一オブジェクトの内部変更を検知しないため再挿入で更新
         var index = Reminders.IndexOf(item);
         if (index >= 0)
         {
@@ -38,5 +40,14 @@ public class MainViewModel
     {
         _service.Remove(item.Id);
         Reminders.Remove(item);
+    }
+
+    private void OnItemUpdated(Guid id)
+    {
+        var item = Reminders.FirstOrDefault(x => x.Id == id);
+        if (item is null) return;
+        var index = Reminders.IndexOf(item);
+        Reminders.RemoveAt(index);
+        Reminders.Insert(index, item);
     }
 }
