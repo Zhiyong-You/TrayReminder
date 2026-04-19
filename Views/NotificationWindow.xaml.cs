@@ -7,6 +7,7 @@ public partial class NotificationWindow : Window
 {
     public event Action<ReminderItem>? Completed;
     public event Action<ReminderItem>? Dismissed;
+    public event Action<ReminderItem, TimeSpan>? Snoozed;
 
     private readonly ReminderItem _item;
     private bool _resultHandled;
@@ -31,6 +32,19 @@ public partial class NotificationWindow : Window
     {
         _resultHandled = true;
         Dismissed?.Invoke(_item);
+        Close();
+    }
+
+    private void Snooze5Button_Click(object sender, RoutedEventArgs e)
+        => DoSnooze(TimeSpan.FromMinutes(5));
+
+    private void Snooze10Button_Click(object sender, RoutedEventArgs e)
+        => DoSnooze(TimeSpan.FromMinutes(10));
+
+    private void DoSnooze(TimeSpan duration)
+    {
+        _resultHandled = true;
+        Snoozed?.Invoke(_item, duration);
         Close();
     }
 

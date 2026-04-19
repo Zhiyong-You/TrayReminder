@@ -31,11 +31,32 @@ public class ReminderService
 
     public void Save() => _storage.Save(_items);
 
+    public void Snooze(Guid id, TimeSpan duration)
+    {
+        var item = _items.FirstOrDefault(x => x.Id == id);
+        if (item is null) return;
+        item.SnoozeUntil = DateTime.Now + duration;
+        _storage.Save(_items);
+        ItemUpdated?.Invoke(id);
+    }
+
     public void MarkCompleted(Guid id)
     {
         var item = _items.FirstOrDefault(x => x.Id == id);
         if (item is null) return;
-        item.IsCompleted = true;
+
+        if (item.RepeatType == RepeatType.None)
+        {
+            item.IsCompleted = true;
+        }
+        else
+        {
+            // 繰り返しリマインダーは次回時刻へ進め、再び通知対象にする
+            item.ReminderTime = RepeatScheduler.NextOccurrence(item.ReminderTime, item.RepeatType);
+            item.IsCompleted = false;
+        }
+
+        item.SnoozeUntil = null;
         _storage.Save(_items);
         ItemUpdated?.Invoke(id);
     }

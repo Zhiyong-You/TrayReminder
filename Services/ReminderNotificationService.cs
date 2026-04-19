@@ -45,6 +45,7 @@ public class ReminderNotificationService
             var window = new NotificationWindow(item);
             window.Completed += OnCompleted;
             window.Dismissed += OnDismissed;
+            window.Snoozed  += OnSnoozed;
             window.Closed += (_, _) => _showing.Remove(item.Id);
             window.Show();
         }
@@ -60,5 +61,12 @@ public class ReminderNotificationService
     {
         // 閉じてから5分間は再通知しない
         _dismissedUntil[item.Id] = DateTime.Now.AddMinutes(5);
+    }
+
+    private void OnSnoozed(ReminderItem item, TimeSpan duration)
+    {
+        _reminderService.Snooze(item.Id, duration);
+        // スヌーズは SnoozeUntil で管理するため _dismissedUntil は不要
+        _dismissedUntil.Remove(item.Id);
     }
 }

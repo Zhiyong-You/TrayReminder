@@ -15,6 +15,9 @@ public partial class QuickAddWindow : Window
         InitializeComponent();
         _service = service;
 
+        RepeatTypeBox.ItemsSource = Enum.GetValues<RepeatType>();
+        RepeatTypeBox.SelectedItem = RepeatType.None;
+
         DateBox.Text = DateTime.Now.ToString("yyyy/MM/dd");
         TimeBox.Text = DateTime.Now.AddHours(1).ToString("HH:mm");
     }
@@ -40,10 +43,11 @@ public partial class QuickAddWindow : Window
 
         var item = new ReminderItem
         {
-            Title       = TitleBox.Text.Trim(),
-            Description = DescriptionBox.Text.Trim(),
+            Title        = TitleBox.Text.Trim(),
+            Description  = DescriptionBox.Text.Trim(),
             ReminderTime = reminderTime,
-            IsEnabled   = IsEnabledCheck.IsChecked == true
+            RepeatType   = (RepeatType)(RepeatTypeBox.SelectedItem ?? RepeatType.None),
+            IsEnabled    = IsEnabledCheck.IsChecked == true
         };
 
         _service.Add(item);
