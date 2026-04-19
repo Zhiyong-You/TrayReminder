@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using TrayReminder.Models;
+using MessageBox = System.Windows.MessageBox;
 
 namespace TrayReminder.Views;
 
