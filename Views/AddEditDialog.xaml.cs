@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Windows;
 using TrayReminder.Models;
 using MessageBox = System.Windows.MessageBox;
@@ -13,22 +12,26 @@ public partial class AddEditDialog : Window
     {
         InitializeComponent();
 
-        RepeatTypeBox.ItemsSource = Enum.GetValues<RepeatType>();
+        ReminderTimeBox.ItemsSource = TimeSlots.All;
+        RepeatTypeBox.ItemsSource   = Enum.GetValues<RepeatType>();
 
         if (existing is not null)
         {
             Result = existing;
-            TitleBox.Text = existing.Title;
-            DescriptionBox.Text = existing.Description;
-            ReminderTimeBox.Text = existing.ReminderTime.ToString("yyyy/MM/dd HH:mm");
-            RepeatTypeBox.SelectedItem = existing.RepeatType;
-            IsEnabledCheck.IsChecked = existing.IsEnabled;
+            TitleBox.Text                   = existing.Title;
+            DescriptionBox.Text             = existing.Description;
+            ReminderDatePicker.SelectedDate = existing.ReminderTime.Date;
+            ReminderTimeBox.SelectedItem    = TimeSlots.FloorToSlot(existing.ReminderTime);
+            RepeatTypeBox.SelectedItem      = existing.RepeatType;
+            IsEnabledCheck.IsChecked        = existing.IsEnabled;
         }
         else
         {
             Result = new ReminderItem();
-            ReminderTimeBox.Text = DateTime.Now.AddHours(1).ToString("yyyy/MM/dd HH:mm");
-            RepeatTypeBox.SelectedItem = RepeatType.None;
+            var defaultDt = DateTime.Now.AddHours(1);
+            ReminderDatePicker.SelectedDate = defaultDt.Date;
+            ReminderTimeBox.SelectedItem    = TimeSlots.FloorToSlot(defaultDt);
+            RepeatTypeBox.SelectedItem      = RepeatType.None;
         }
     }
 
@@ -41,25 +44,38 @@ public partial class AddEditDialog : Window
             return;
         }
 
-        if (!DateTime.TryParseExact(ReminderTimeBox.Text, "yyyy/MM/dd HH:mm",
-            CultureInfo.InvariantCulture, DateTimeStyles.None, out var time))
+        if (ReminderDatePicker.SelectedDate is null)
         {
-            MessageBox.Show("通知日時の形式が正しくありません。\n例: 2026/04/20 09:00",
-                "TrayReminder", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("日付を選択してください。", "TrayReminder",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
-        Result.Title = TitleBox.Text.Trim();
+        if (ReminderTimeBox.SelectedItem is null)
+        {
+            MessageBox.Show("時刻を選択してください。", "TrayReminder",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        Result.Title       = TitleBox.Text.Trim();
         Result.Description = DescriptionBox.Text.Trim();
-        Result.ReminderTime = time;
+        Result.ReminderTime = CombineDateTime(
+            ReminderDatePicker.SelectedDate.Value,
+            (string)ReminderTimeBox.SelectedItem);
         Result.RepeatType = (RepeatType)(RepeatTypeBox.SelectedItem ?? RepeatType.None);
-        Result.IsEnabled = IsEnabledCheck.IsChecked == true;
+        Result.IsEnabled  = IsEnabledCheck.IsChecked == true;
 
         DialogResult = true;
     }
 
-    private void CancelButton_Click(object sender, RoutedEventArgs e)
+    private void CancelButton_Click(object sender, RoutedEventArgs e) => DialogResult = false;
+
+    private static DateTime CombineDateTime(DateTime date, string timeSlot)
     {
-        DialogResult = false;
+        var parts = timeSlot.Split(':');
+        return date.Date
+            .AddHours(int.Parse(parts[0]))
+            .AddMinutes(int.Parse(parts[1]));
     }
 }

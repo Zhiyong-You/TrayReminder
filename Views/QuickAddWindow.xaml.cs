@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Windows;
 using TrayReminder.Models;
 using TrayReminder.Services;
@@ -15,11 +14,14 @@ public partial class QuickAddWindow : Window
         InitializeComponent();
         _service = service;
 
-        RepeatTypeBox.ItemsSource = Enum.GetValues<RepeatType>();
+        RepeatTypeBox.ItemsSource  = Enum.GetValues<RepeatType>();
         RepeatTypeBox.SelectedItem = RepeatType.None;
 
-        DateBox.Text = DateTime.Now.ToString("yyyy/MM/dd");
-        TimeBox.Text = DateTime.Now.AddHours(1).ToString("HH:mm");
+        ReminderTimeBox.ItemsSource = TimeSlots.All;
+
+        var defaultDt = DateTime.Now.AddHours(1);
+        ReminderDatePicker.SelectedDate = defaultDt.Date;
+        ReminderTimeBox.SelectedItem    = TimeSlots.FloorToSlot(defaultDt);
     }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -32,14 +34,23 @@ public partial class QuickAddWindow : Window
             return;
         }
 
-        var dateTimeText = $"{DateBox.Text.Trim()} {TimeBox.Text.Trim()}";
-        if (!DateTime.TryParseExact(dateTimeText, "yyyy/MM/dd HH:mm",
-            CultureInfo.InvariantCulture, DateTimeStyles.None, out var reminderTime))
+        if (ReminderDatePicker.SelectedDate is null)
         {
-            MessageBox.Show("日付・時刻の形式が正しくありません。\n日付: 2026/04/20\n時刻: 09:00",
-                "TrayReminder", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("日付を選択してください。", "TrayReminder",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
+
+        if (ReminderTimeBox.SelectedItem is null)
+        {
+            MessageBox.Show("時刻を選択してください。", "TrayReminder",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var reminderTime = CombineDateTime(
+            ReminderDatePicker.SelectedDate.Value,
+            (string)ReminderTimeBox.SelectedItem);
 
         var item = new ReminderItem
         {
@@ -54,8 +65,13 @@ public partial class QuickAddWindow : Window
         Close();
     }
 
-    private void CancelButton_Click(object sender, RoutedEventArgs e)
+    private void CancelButton_Click(object sender, RoutedEventArgs e) => Close();
+
+    private static DateTime CombineDateTime(DateTime date, string timeSlot)
     {
-        Close();
+        var parts = timeSlot.Split(':');
+        return date.Date
+            .AddHours(int.Parse(parts[0]))
+            .AddMinutes(int.Parse(parts[1]));
     }
 }

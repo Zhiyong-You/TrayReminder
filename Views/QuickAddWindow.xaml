@@ -28,12 +28,10 @@
                  Height="48" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,4"/>
 
         <Label Grid.Row="2" Grid.Column="0" Content="日付" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="2" Grid.Column="1" x:Name="DateBox" Margin="0,4"
-                 ToolTip="例: 2026/04/20"/>
+        <DatePicker Grid.Row="2" Grid.Column="1" x:Name="ReminderDatePicker" Margin="0,4"/>
 
         <Label Grid.Row="3" Grid.Column="0" Content="時刻" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="3" Grid.Column="1" x:Name="TimeBox" Margin="0,4"
-                 ToolTip="例: 09:00"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ReminderTimeBox" Margin="0,4"/>
 
         <Label Grid.Row="4" Grid.Column="0" Content="繰り返し" VerticalAlignment="Center"/>
         <ComboBox Grid.Row="4" Grid.Column="1" x:Name="RepeatTypeBox" Margin="0,4"/>
