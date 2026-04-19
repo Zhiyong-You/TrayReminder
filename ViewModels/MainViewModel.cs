@@ -13,6 +13,7 @@ public class MainViewModel
     public MainViewModel(ReminderService service)
     {
         _service = service;
+        _service.ItemAdded  += item => Reminders.Add(item);
         _service.ItemUpdated += OnItemUpdated;
 
         foreach (var item in _service.GetAll())
@@ -21,8 +22,8 @@ public class MainViewModel
 
     public void AddReminder(ReminderItem item)
     {
+        // ItemAdded イベント経由で Reminders へ追加されるため直接 Add しない
         _service.Add(item);
-        Reminders.Add(item);
     }
 
     public void UpdateReminder(ReminderItem item)

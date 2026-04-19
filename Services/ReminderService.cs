@@ -18,7 +18,10 @@ public class ReminderService
     {
         _items.Add(item);
         _storage.Save(_items);
+        ItemAdded?.Invoke(item);
     }
+
+    public event Action<ReminderItem>? ItemAdded;
 
     public void Remove(Guid id)
     {
