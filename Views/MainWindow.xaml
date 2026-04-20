@@ -1,40 +1,286 @@
 <Window x:Class="TrayReminder.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="TrayReminder" Height="400" Width="560"
-        MinHeight="300" MinWidth="420">
+        Title="TrayReminder" Height="500" Width="740"
+        MinHeight="380" MinWidth="580">
 
-    <Grid Margin="12">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Window.Resources>
+        <!-- ===== Brushes ===== -->
+        <SolidColorBrush x:Key="SidebarBg"       Color="#1E1A2E"/>
+        <SolidColorBrush x:Key="SidebarText"      Color="#E2DEFF"/>
+        <SolidColorBrush x:Key="SidebarSubText"   Color="#7A7490"/>
+        <SolidColorBrush x:Key="SidebarDivider"   Color="#2D2647"/>
+        <SolidColorBrush x:Key="ListHoverBg"      Color="#2D2647"/>
+        <SolidColorBrush x:Key="ListSelectedBg"   Color="#3D3260"/>
+        <SolidColorBrush x:Key="AccentBrush"      Color="#7C65D8"/>
+        <SolidColorBrush x:Key="AccentHoverBrush" Color="#9070F0"/>
+        <SolidColorBrush x:Key="DetailBg"         Color="#F5F3FF"/>
+        <SolidColorBrush x:Key="DetailText"       Color="#1A1630"/>
+        <SolidColorBrush x:Key="SecondaryText"    Color="#6B6A8D"/>
+        <SolidColorBrush x:Key="NoteBg"           Color="#EBE6F8"/>
+        <SolidColorBrush x:Key="DangerBrush"      Color="#C0392B"/>
 
-        <ListView Grid.Row="0" x:Name="ReminderList"
-                  ItemsSource="{Binding Reminders}"
-                  Margin="0,0,0,8">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="タイトル"  Width="220" DisplayMemberBinding="{Binding Title}"/>
-                    <GridViewColumn Header="通知日時"  Width="140" DisplayMemberBinding="{Binding ReminderTime, StringFormat=yyyy/MM/dd HH:mm}"/>
-                    <GridViewColumn Header="有効" Width="50">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsEnabled, Mode=OneWay}"
-                                          IsHitTestVisible="False" Focusable="False"
-                                          HorizontalAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <!-- ===== Add Button ===== -->
+        <Style x:Key="AddButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="0,10"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background"
+                                        Value="{StaticResource AccentHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#6050C0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="追加" Width="80" Margin="0,0,8,0" Click="AddButton_Click"/>
-            <Button Content="編集" Width="80" Margin="0,0,8,0" Click="EditButton_Click"/>
-            <Button Content="削除" Width="80" Click="DeleteButton_Click"/>
-        </StackPanel>
+        <!-- ===== Action Button (Edit / Delete) ===== -->
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="20,8"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                CornerRadius="5" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===== ListViewItem ===== -->
+        <Style TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding"  Value="0"/>
+            <Setter Property="Margin"   Value="4,1"/>
+            <Setter Property="Cursor"   Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="5">
+                            <ContentPresenter Margin="10,7"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background"
+                                        Value="{StaticResource ListHoverBg}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background"
+                                        Value="{StaticResource ListSelectedBg}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="230"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ================================================ -->
+        <!-- Left Sidebar                                      -->
+        <!-- ================================================ -->
+        <Grid Grid.Column="0" Background="{StaticResource SidebarBg}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- App title header -->
+            <Border Grid.Row="0" Padding="16,16,16,12"
+                    BorderBrush="{StaticResource SidebarDivider}" BorderThickness="0,0,0,1">
+                <StackPanel>
+                    <TextBlock Text="TrayReminder"
+                               Foreground="{StaticResource SidebarText}"
+                               FontSize="16" FontWeight="Bold"/>
+                    <TextBlock x:Name="ReminderCountText"
+                               Foreground="{StaticResource SidebarSubText}"
+                               FontSize="11" Margin="0,3,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Reminder list -->
+            <ListView Grid.Row="1" x:Name="ReminderList"
+                      ItemsSource="{Binding Reminders}"
+                      Background="Transparent"
+                      BorderThickness="0"
+                      Padding="6,6,6,0"
+                      SelectionChanged="ReminderList_SelectionChanged"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Title}"
+                                           Foreground="{StaticResource SidebarText}"
+                                           FontSize="13"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding ReminderTime, StringFormat=MM/dd HH:mm}"
+                                           Foreground="{StaticResource SidebarSubText}"
+                                           FontSize="11" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <!-- Enabled indicator dot -->
+                            <Ellipse Grid.Column="1"
+                                     Width="6" Height="6"
+                                     VerticalAlignment="Center" Margin="8,0,2,0">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="#4CAF50"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                <Setter Property="Fill" Value="#3A3555"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <!-- Add button -->
+            <Button Grid.Row="2"
+                    Content="＋  リマインダーを追加"
+                    Margin="12,8,12,12"
+                    Style="{StaticResource AddButtonStyle}"
+                    Click="AddButton_Click"/>
+        </Grid>
+
+        <!-- ================================================ -->
+        <!-- Right Detail Area                                 -->
+        <!-- ================================================ -->
+        <Grid Grid.Column="1" Background="{StaticResource DetailBg}">
+
+            <!-- Placeholder when nothing is selected -->
+            <StackPanel x:Name="NoSelectionPanel"
+                        VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="○"
+                           FontSize="36" Foreground="#C4BFDE"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="リマインダーを選択してください"
+                           Foreground="{StaticResource SecondaryText}"
+                           FontSize="13" Margin="0,10,0,0"/>
+            </StackPanel>
+
+            <!-- Detail panel (shown when item is selected) -->
+            <ScrollViewer x:Name="DetailPanel"
+                          Visibility="Collapsed"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="28,24,28,24">
+
+                    <!-- Title -->
+                    <TextBlock x:Name="DetailTitle"
+                               FontSize="20" FontWeight="SemiBold"
+                               Foreground="{StaticResource DetailText}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,16"/>
+
+                    <!-- Meta info card -->
+                    <Border Background="White" CornerRadius="7"
+                            Padding="14,12" Margin="0,0,0,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0"
+                                       Text="通知日時"
+                                       Foreground="{StaticResource SecondaryText}" FontSize="12"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1"
+                                       x:Name="DetailTime"
+                                       Foreground="{StaticResource DetailText}" FontSize="13"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0"
+                                       Text="繰り返し"
+                                       Foreground="{StaticResource SecondaryText}" FontSize="12"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1"
+                                       x:Name="DetailRepeat"
+                                       Foreground="{StaticResource DetailText}" FontSize="13"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0"
+                                       Text="有効"
+                                       Foreground="{StaticResource SecondaryText}" FontSize="12"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1"
+                                       x:Name="DetailEnabled"
+                                       FontSize="13"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Notes section -->
+                    <TextBlock Text="メモ"
+                               Foreground="{StaticResource SecondaryText}"
+                               FontSize="12" Margin="0,0,0,5"/>
+                    <Border Background="{StaticResource NoteBg}"
+                            CornerRadius="7" Padding="12,10" Margin="0,0,0,24">
+                        <TextBlock x:Name="DetailDescription"
+                                   Foreground="{StaticResource DetailText}"
+                                   FontSize="13" TextWrapping="Wrap"/>
+                    </Border>
+
+                    <!-- Action buttons -->
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="編集"
+                                Style="{StaticResource ActionButtonStyle}"
+                                Background="{StaticResource AccentBrush}"
+                                Foreground="White"
+                                Margin="0,0,8,0"
+                                Click="EditButton_Click"/>
+                        <Button Content="削除"
+                                Style="{StaticResource ActionButtonStyle}"
+                                Background="{StaticResource DangerBrush}"
+                                Foreground="White"
+                                Click="DeleteButton_Click"/>
+                    </StackPanel>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
     </Grid>
-
 </Window>
