@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
 using TrayReminder.Models;
 using TrayReminder.Services;
@@ -70,6 +71,13 @@ public partial class MainWindow : Window
         }
     }
 
+    private void SnoozeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (ReminderList.SelectedItem is not ReminderItem selected) return;
+        _viewModel.SnoozeReminder(selected, TimeSpan.FromMinutes(10));
+        ShowDetail(selected);
+    }
+
     private void ReminderList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (ReminderList.SelectedItem is ReminderItem selected)
@@ -95,13 +103,15 @@ public partial class MainWindow : Window
 
         if (item.IsEnabled)
         {
-            DetailEnabled.Text = "有効";
-            DetailEnabled.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x2E, 0x7D, 0x32));
+            DetailEnabled.Text = "● 有効";
+            DetailEnabled.Foreground = Brushes.White;
+            DetailEnabledBadge.Background = new SolidColorBrush(Color.FromRgb(0x38, 0x8A, 0x61));
         }
         else
         {
-            DetailEnabled.Text = "無効";
-            DetailEnabled.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x9E, 0x9E, 0x9E));
+            DetailEnabled.Text = "○ 無効";
+            DetailEnabled.Foreground = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x99));
+            DetailEnabledBadge.Background = new SolidColorBrush(Color.FromRgb(0xE0, 0xDD, 0xF0));
         }
 
         var desc = item.Description?.Trim();

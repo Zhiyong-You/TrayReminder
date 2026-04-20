@@ -43,6 +43,11 @@ public class MainViewModel
         Reminders.Remove(item);
     }
 
+    public void SnoozeReminder(ReminderItem item, TimeSpan duration)
+    {
+        _service.Snooze(item.Id, duration);
+    }
+
     private void OnItemUpdated(Guid id)
     {
         var item = Reminders.FirstOrDefault(x => x.Id == id);
