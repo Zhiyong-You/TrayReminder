@@ -6,19 +6,22 @@
 
     <Window.Resources>
         <!-- ===== Brushes ===== -->
-        <SolidColorBrush x:Key="SidebarBg"       Color="#1E1A2E"/>
-        <SolidColorBrush x:Key="SidebarText"      Color="#E2DEFF"/>
-        <SolidColorBrush x:Key="SidebarSubText"   Color="#7A7490"/>
-        <SolidColorBrush x:Key="SidebarDivider"   Color="#2D2647"/>
-        <SolidColorBrush x:Key="ListHoverBg"      Color="#2D2647"/>
-        <SolidColorBrush x:Key="ListSelectedBg"   Color="#3D3260"/>
-        <SolidColorBrush x:Key="AccentBrush"      Color="#7C65D8"/>
-        <SolidColorBrush x:Key="AccentHoverBrush" Color="#9070F0"/>
-        <SolidColorBrush x:Key="DetailBg"         Color="#F5F3FF"/>
-        <SolidColorBrush x:Key="DetailText"       Color="#1A1630"/>
-        <SolidColorBrush x:Key="SecondaryText"    Color="#6B6A8D"/>
-        <SolidColorBrush x:Key="NoteBg"           Color="#EBE6F8"/>
-        <SolidColorBrush x:Key="DangerBrush"      Color="#C0392B"/>
+        <SolidColorBrush x:Key="SidebarBg"         Color="#1E1A2E"/>
+        <SolidColorBrush x:Key="SidebarText"       Color="#E2DEFF"/>
+        <SolidColorBrush x:Key="SidebarSubText"    Color="#7A7490"/>
+        <SolidColorBrush x:Key="SidebarDivider"    Color="#2D2647"/>
+        <SolidColorBrush x:Key="CardBg"            Color="#252240"/>
+        <SolidColorBrush x:Key="CardHoverBg"       Color="#2E2852"/>
+        <SolidColorBrush x:Key="CardSelectedBg"    Color="#352F60"/>
+        <SolidColorBrush x:Key="CardDisabledText"  Color="#4E4A68"/>
+        <SolidColorBrush x:Key="CardDisabledSub"   Color="#3A3655"/>
+        <SolidColorBrush x:Key="AccentBrush"       Color="#7C65D8"/>
+        <SolidColorBrush x:Key="AccentHoverBrush"  Color="#9070F0"/>
+        <SolidColorBrush x:Key="DetailBg"          Color="#F5F3FF"/>
+        <SolidColorBrush x:Key="DetailText"        Color="#1A1630"/>
+        <SolidColorBrush x:Key="SecondaryText"     Color="#6B6A8D"/>
+        <SolidColorBrush x:Key="NoteBg"            Color="#EBE6F8"/>
+        <SolidColorBrush x:Key="DangerBrush"       Color="#C0392B"/>
 
         <!-- ===== Add Button ===== -->
         <Style x:Key="AddButtonStyle" TargetType="Button">
@@ -75,26 +78,47 @@
             </Setter>
         </Style>
 
-        <!-- ===== ListViewItem ===== -->
+        <!-- ===== ListViewItem (card style) ===== -->
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <Setter Property="Padding"  Value="0"/>
-            <Setter Property="Margin"   Value="4,1"/>
-            <Setter Property="Cursor"   Value="Hand"/>
+            <Setter Property="Padding"         Value="0"/>
+            <Setter Property="Margin"          Value="0,2"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListViewItem">
-                        <Border x:Name="Bd" Background="Transparent" CornerRadius="5">
-                            <ContentPresenter Margin="10,7"/>
+                        <!-- Card outer border -->
+                        <Border x:Name="CardBd"
+                                Background="{StaticResource CardBg}"
+                                CornerRadius="7"
+                                Margin="8,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <!-- Left accent bar column -->
+                                    <ColumnDefinition Width="3"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Accent bar: visible only when selected -->
+                                <Border x:Name="AccentBar"
+                                        Grid.Column="0"
+                                        Background="Transparent"
+                                        CornerRadius="7,0,0,7"/>
+                                <ContentPresenter Grid.Column="1"
+                                                  Margin="10,9,10,9"
+                                                  VerticalAlignment="Center"/>
+                            </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background"
-                                        Value="{StaticResource ListHoverBg}"/>
+                                <Setter TargetName="CardBd" Property="Background"
+                                        Value="{StaticResource CardHoverBg}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background"
-                                        Value="{StaticResource ListSelectedBg}"/>
+                                <Setter TargetName="CardBd" Property="Background"
+                                        Value="{StaticResource CardSelectedBg}"/>
+                                <Setter TargetName="AccentBar" Property="Background"
+                                        Value="{StaticResource AccentBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -137,7 +161,7 @@
                       ItemsSource="{Binding Reminders}"
                       Background="Transparent"
                       BorderThickness="0"
-                      Padding="6,6,6,0"
+                      Padding="0,4,0,4"
                       SelectionChanged="ReminderList_SelectionChanged"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ItemTemplate>
@@ -147,31 +171,47 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Title}"
-                                           Foreground="{StaticResource SidebarText}"
-                                           FontSize="13"
-                                           TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Text="{Binding ReminderTime, StringFormat=MM/dd HH:mm}"
-                                           Foreground="{StaticResource SidebarSubText}"
-                                           FontSize="11" Margin="0,2,0,0"/>
-                            </StackPanel>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Title -->
+                            <TextBlock x:Name="TitleText"
+                                       Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding Title}"
+                                       Foreground="{StaticResource SidebarText}"
+                                       FontSize="13"
+                                       TextTrimming="CharacterEllipsis"/>
+
                             <!-- Enabled indicator dot -->
-                            <Ellipse Grid.Column="1"
+                            <Ellipse x:Name="StatusDot"
+                                     Grid.Row="0" Grid.Column="1"
                                      Width="6" Height="6"
-                                     VerticalAlignment="Center" Margin="8,0,2,0">
-                                <Ellipse.Style>
-                                    <Style TargetType="Ellipse">
-                                        <Setter Property="Fill" Value="#4CAF50"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
-                                                <Setter Property="Fill" Value="#3A3555"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Ellipse.Style>
-                            </Ellipse>
+                                     Fill="#4CAF50"
+                                     VerticalAlignment="Center"
+                                     Margin="8,0,2,0"/>
+
+                            <!-- Date / time -->
+                            <TextBlock x:Name="TimeText"
+                                       Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Text="{Binding ReminderTime, StringFormat=MM/dd HH:mm}"
+                                       Foreground="{StaticResource SidebarSubText}"
+                                       FontSize="11"
+                                       Margin="0,3,0,0"/>
                         </Grid>
+
+                        <!-- Disabled state: mute colors -->
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                <Setter TargetName="TitleText" Property="Foreground"
+                                        Value="{StaticResource CardDisabledText}"/>
+                                <Setter TargetName="TimeText"  Property="Foreground"
+                                        Value="{StaticResource CardDisabledSub}"/>
+                                <Setter TargetName="StatusDot" Property="Fill"
+                                        Value="#3A3555"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
