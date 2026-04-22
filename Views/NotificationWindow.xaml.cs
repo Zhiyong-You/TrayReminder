@@ -18,7 +18,15 @@ public partial class NotificationWindow : Window
         _item = item;
         TitleText.Text = item.Title;
         TimeText.Text = item.ReminderTime.ToString("yyyy/MM/dd HH:mm");
-        DescriptionText.Text = item.Description;
+        if (string.IsNullOrWhiteSpace(item.Description))
+        {
+            DescriptionText.Text = "メモなし";
+            DescriptionText.Foreground = (System.Windows.Media.Brush)FindResource("DialogLabelFg");
+        }
+        else
+        {
+            DescriptionText.Text = item.Description;
+        }
     }
 
     private void CompleteButton_Click(object sender, RoutedEventArgs e)

@@ -1,44 +1,44 @@
 <Window x:Class="TrayReminder.Views.ConfirmDeleteDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="削除の確認" Height="186" Width="360"
+        Title="削除の確認" Height="200" Width="380"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource DialogBg}">
 
-    <Grid Margin="22,18,22,18">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="10"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <DockPanel Margin="22,18,22,18" LastChildFill="True">
 
-        <!-- Header -->
-        <TextBlock Grid.Row="0"
-                   Text="リマインダーを削除"
-                   FontSize="15" FontWeight="SemiBold"
-                   Foreground="{StaticResource DialogTitleFg}"/>
-
-        <!-- Message -->
-        <TextBlock Grid.Row="2" x:Name="MessageText"
-                   FontSize="13" TextWrapping="Wrap"
-                   Foreground="{StaticResource DialogLabelFg}"
-                   LineHeight="20"/>
-
-        <!-- Buttons: キャンセル left, 削除 right -->
-        <!-- キャンセルを先に置き誤操作を防止 -->
-        <StackPanel Grid.Row="4" Orientation="Horizontal"
-                    HorizontalAlignment="Right" Margin="0,8,0,0">
+        <!-- フッター：ボタンを下部固定 -->
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal" HorizontalAlignment="Right"
+                    Margin="0,14,0,0">
             <Button Content="キャンセル"
                     Style="{StaticResource SecondaryButtonStyle}"
+                    MinWidth="96" Padding="16,8"
                     Margin="0,0,8,0"
                     IsCancel="True"
                     Click="CancelButton_Click"/>
             <Button Content="削除"
                     Style="{StaticResource DangerButtonStyle}"
+                    MinWidth="96" Padding="16,8"
                     Click="DeleteButton_Click"/>
         </StackPanel>
-    </Grid>
+
+        <!-- コンテンツ -->
+        <StackPanel>
+            <TextBlock Text="リマインダーを削除"
+                       FontSize="15" FontWeight="SemiBold"
+                       Foreground="{StaticResource DialogTitleFg}"
+                       Margin="0,0,0,12"/>
+            <TextBlock x:Name="MessageText"
+                       FontSize="13" TextWrapping="Wrap"
+                       Foreground="{StaticResource DialogTitleFg}"
+                       LineHeight="20"
+                       Margin="0,0,0,6"/>
+            <TextBlock Text="この操作は取り消せません。"
+                       FontSize="12"
+                       Foreground="{StaticResource DialogLabelFg}"/>
+        </StackPanel>
+
+    </DockPanel>
 </Window>

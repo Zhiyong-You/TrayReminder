@@ -9,6 +9,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>TrayReminder</AssemblyName>
     <RootNamespace>TrayReminder</RootNamespace>
+    <ApplicationIcon>TrayReminder.ico</ApplicationIcon>
   </PropertyGroup>
 
 </Project>

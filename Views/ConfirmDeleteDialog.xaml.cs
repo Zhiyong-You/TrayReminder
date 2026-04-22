@@ -7,7 +7,7 @@ public partial class ConfirmDeleteDialog : Window
     public ConfirmDeleteDialog(string itemTitle)
     {
         InitializeComponent();
-        MessageText.Text = $"「{itemTitle}」を削除しますか？\nこの操作は取り消せません。";
+        MessageText.Text = $"「{itemTitle}」を削除しますか？";
     }
 
     private void DeleteButton_Click(object sender, RoutedEventArgs e) => DialogResult = true;
