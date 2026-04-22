@@ -12,4 +12,8 @@
     <ApplicationIcon>TrayReminder.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="TrayReminder.ico"/>
+  </ItemGroup>
+
 </Project>
