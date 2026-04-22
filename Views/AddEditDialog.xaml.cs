@@ -15,6 +15,8 @@ public partial class AddEditDialog : Window
         ReminderTimeBox.ItemsSource = TimeSlots.All;
         RepeatTypeBox.ItemsSource   = Enum.GetValues<RepeatType>();
 
+        DialogTitleText.Text = existing is not null ? "リマインダーを編集" : "リマインダーを追加";
+
         if (existing is not null)
         {
             Result = existing;

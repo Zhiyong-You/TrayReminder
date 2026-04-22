@@ -62,9 +62,8 @@ public partial class MainWindow : Window
     private void DeleteButton_Click(object sender, RoutedEventArgs e)
     {
         if (ReminderList.SelectedItem is not ReminderItem selected) return;
-        var answer = MessageBox.Show($"「{selected.Title}」を削除しますか？", "TrayReminder",
-            MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (answer == MessageBoxResult.Yes)
+        var dialog = new ConfirmDeleteDialog(selected.Title) { Owner = this };
+        if (dialog.ShowDialog() == true)
         {
             _viewModel.RemoveReminder(selected);
             ClearDetail();
