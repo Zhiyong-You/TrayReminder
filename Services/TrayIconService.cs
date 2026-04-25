@@ -12,13 +12,15 @@ public class TrayIconService : IDisposable
     private readonly Action _openNewReminder;
     private readonly Action _exitApp;
     private readonly Icon? _customIcon;
+    private readonly ReminderService _reminderService;
     private bool _disposed;
 
-    public TrayIconService(MainWindow mainWindow, Action openNewReminder, Action exitApp)
+    public TrayIconService(MainWindow mainWindow, Action openNewReminder, Action exitApp, ReminderService reminderService)
     {
         _mainWindow = mainWindow;
         _openNewReminder = openNewReminder;
         _exitApp = exitApp;
+        _reminderService = reminderService;
 
         _customIcon = LoadAppIcon();
 
@@ -31,6 +33,17 @@ public class TrayIconService : IDisposable
         };
 
         _notifyIcon.DoubleClick += (_, _) => ShowMainWindow();
+
+        _reminderService.Changed += UpdateTooltip;
+        UpdateTooltip();
+    }
+
+    private void UpdateTooltip()
+    {
+        var count = _reminderService.GetAll().Count(r => !r.IsCompleted && r.IsEnabled);
+        _notifyIcon.Text = count > 0
+            ? $"TrayReminder\n未完了: {count}件"
+            : "TrayReminder";
     }
 
     // TrayReminder.ico をアセンブリの EmbeddedResource から読み込む
@@ -71,6 +84,7 @@ public class TrayIconService : IDisposable
     {
         if (_disposed) return;
         _disposed = true;
+        _reminderService.Changed -= UpdateTooltip;
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();
         _customIcon?.Dispose();

@@ -25,7 +25,7 @@ public partial class App : WpfApplication
         _notificationService = new ReminderNotificationService(_reminderService);
 
         var mainWindow = new MainWindow(_reminderService);
-        _trayIconService = new TrayIconService(mainWindow, OpenQuickAdd, ExitApp);
+        _trayIconService = new TrayIconService(mainWindow, OpenQuickAdd, ExitApp, _reminderService);
         mainWindow.Show();
 
         _notificationService.Start();

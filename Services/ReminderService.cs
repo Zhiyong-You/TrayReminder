@@ -19,6 +19,7 @@ public class ReminderService
         _items.Add(item);
         _storage.Save(_items);
         ItemAdded?.Invoke(item);
+        Changed?.Invoke();
     }
 
     public event Action<ReminderItem>? ItemAdded;
@@ -27,9 +28,14 @@ public class ReminderService
     {
         _items.RemoveAll(x => x.Id == id);
         _storage.Save(_items);
+        Changed?.Invoke();
     }
 
-    public void Save() => _storage.Save(_items);
+    public void Save()
+    {
+        _storage.Save(_items);
+        Changed?.Invoke();
+    }
 
     public void Snooze(Guid id, TimeSpan duration)
     {
@@ -38,6 +44,7 @@ public class ReminderService
         item.SnoozeUntil = DateTime.Now + duration;
         _storage.Save(_items);
         ItemUpdated?.Invoke(id);
+        Changed?.Invoke();
     }
 
     public void MarkCompleted(Guid id)
@@ -59,7 +66,9 @@ public class ReminderService
         item.SnoozeUntil = null;
         _storage.Save(_items);
         ItemUpdated?.Invoke(id);
+        Changed?.Invoke();
     }
 
     public event Action<Guid>? ItemUpdated;
+    public event Action? Changed;
 }

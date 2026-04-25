@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Threading;
 using TrayReminder.Models;
 
 namespace TrayReminder.Views;
@@ -10,7 +11,10 @@ public partial class NotificationWindow : Window
     public event Action<ReminderItem, TimeSpan>? Snoozed;
 
     private readonly ReminderItem _item;
+    private readonly DispatcherTimer _autoCloseTimer;
     private bool _resultHandled;
+
+    private const int AutoCloseSeconds = 30;
 
     public NotificationWindow(ReminderItem item)
     {
@@ -27,6 +31,10 @@ public partial class NotificationWindow : Window
         {
             DescriptionText.Text = item.Description;
         }
+
+        _autoCloseTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(AutoCloseSeconds) };
+        _autoCloseTimer.Tick += (_, _) => Dismiss();
+        _autoCloseTimer.Start();
     }
 
     private void CompleteButton_Click(object sender, RoutedEventArgs e)
@@ -36,12 +44,7 @@ public partial class NotificationWindow : Window
         Close();
     }
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
-    {
-        _resultHandled = true;
-        Dismissed?.Invoke(_item);
-        Close();
-    }
+    private void CloseButton_Click(object sender, RoutedEventArgs e) => Dismiss();
 
     private void Snooze5Button_Click(object sender, RoutedEventArgs e)
         => DoSnooze(TimeSpan.FromMinutes(5));
@@ -56,8 +59,17 @@ public partial class NotificationWindow : Window
         Close();
     }
 
+    // 「閉じる」ボタン・自動クローズ・×ボタン共通の dismiss 処理
+    private void Dismiss()
+    {
+        _resultHandled = true;
+        Dismissed?.Invoke(_item);
+        Close();
+    }
+
     protected override void OnClosed(EventArgs e)
     {
+        _autoCloseTimer.Stop();
         // ×ボタンで閉じた場合も dismiss として扱う
         if (!_resultHandled)
             Dismissed?.Invoke(_item);
