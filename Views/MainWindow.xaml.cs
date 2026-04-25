@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
@@ -20,6 +21,13 @@ public partial class MainWindow : Window
         InitializeComponent();
         _viewModel = new MainViewModel(reminderService);
         DataContext = _viewModel;
+
+        // ソート：未完了→有効→ReminderTime昇順→タイトル昇順
+        var view = CollectionViewSource.GetDefaultView(_viewModel.Reminders);
+        view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.IsCompleted),  ListSortDirection.Ascending));
+        view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.IsEnabled),    ListSortDirection.Descending));
+        view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.ReminderTime), ListSortDirection.Ascending));
+        view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.Title),        ListSortDirection.Ascending));
 
         _viewModel.Reminders.CollectionChanged += (_, _) => UpdateCountText();
         UpdateCountText();
