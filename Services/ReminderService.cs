@@ -28,8 +28,11 @@ public class ReminderService
     {
         _items.RemoveAll(x => x.Id == id);
         _storage.Save(_items);
+        ItemRemoved?.Invoke(id);
         Changed?.Invoke();
     }
+
+    public event Action<Guid>? ItemRemoved;
 
     public void Save()
     {

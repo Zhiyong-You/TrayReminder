@@ -6,7 +6,8 @@
         WindowStartupLocation="Manual"
         Topmost="True"
         ResizeMode="NoResize"
-        Background="{StaticResource DialogBg}">
+        Background="{StaticResource DialogBg}"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
     <DockPanel>
 

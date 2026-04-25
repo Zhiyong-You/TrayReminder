@@ -1,4 +1,6 @@
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using TrayReminder.Models;
 
@@ -64,6 +66,18 @@ public partial class NotificationWindow : Window
 
         Left = workArea.Right - Width - EdgeMargin;
         Top  = bottom - Height;
+    }
+
+    private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        // ビジュアルツリーを上方向に辿り、ButtonBase 祖先があればドラッグしない
+        var src = e.OriginalSource as DependencyObject;
+        while (src is not null && src != this)
+        {
+            if (src is System.Windows.Controls.Primitives.ButtonBase) return;
+            src = VisualTreeHelper.GetParent(src);
+        }
+        DragMove();
     }
 
     private void CompleteButton_Click(object sender, RoutedEventArgs e)
