@@ -24,6 +24,138 @@
         <SolidColorBrush x:Key="SnoozeBrush"       Color="#6B6191"/>
         <SolidColorBrush x:Key="DangerBrush"       Color="#C0392B"/>
 
+        <!-- ===== Filter ComboBox Item ===== -->
+        <!-- FilterComboBoxStyle より先に宣言（StaticResource 参照のため） -->
+        <Style x:Key="FilterComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Foreground"       Value="#C8C3E8"/>
+            <Setter Property="Background"       Value="Transparent"/>
+            <Setter Property="Padding"          Value="10,6"/>
+            <Setter Property="FontSize"         Value="11"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#2E2852"/>
+                                <Setter Property="Foreground" Value="#E2DEFF"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#352F60"/>
+                                <Setter Property="Foreground" Value="#E2DEFF"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected"    Value="True"/>
+                                    <Condition Property="IsHighlighted" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="#3E3870"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===== Filter ComboBox ===== -->
+        <Style x:Key="FilterComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Foreground"         Value="#C8C3E8"/>
+            <Setter Property="Background"         Value="#252240"/>
+            <Setter Property="BorderBrush"        Value="#3D3860"/>
+            <Setter Property="BorderThickness"    Value="1"/>
+            <Setter Property="FontSize"           Value="11"/>
+            <Setter Property="Cursor"             Value="Hand"/>
+            <Setter Property="FocusVisualStyle"   Value="{x:Null}"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource FilterComboBoxItemStyle}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <!-- メインボタン領域 -->
+                            <Border x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="22"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- 選択中アイテム表示 -->
+                                    <ContentPresenter Grid.Column="0"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      Margin="9,5,0,5"
+                                                      VerticalAlignment="Center"
+                                                      IsHitTestVisible="False"
+                                                      TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                    <!-- ドロップダウン矢印 -->
+                                    <Path x:Name="Arrow"
+                                          Grid.Column="1"
+                                          Data="M 0 0 L 4 4 L 8 0"
+                                          Stroke="#7A7490"
+                                          StrokeThickness="1.5"
+                                          StrokeLineJoin="Round"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          IsHitTestVisible="False"/>
+                                </Grid>
+                            </Border>
+                            <!-- クリック受付用透明トグルボタン -->
+                            <ToggleButton IsChecked="{Binding IsDropDownOpen, Mode=TwoWay,
+                                                       RelativeSource={RelativeSource TemplatedParent}}"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          Focusable="False"
+                                          ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="Transparent"/>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <!-- ドロップダウン Popup -->
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Border Background="#252240"
+                                        BorderBrush="#3D3860"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        MinWidth="{TemplateBinding ActualWidth}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd"    Property="Background"  Value="#2E2852"/>
+                                <Setter TargetName="Bd"    Property="BorderBrush" Value="#5A4FAA"/>
+                                <Setter TargetName="Arrow" Property="Stroke"      Value="#9B8FE8"/>
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="Bd"    Property="BorderBrush" Value="#7C65D8"/>
+                                <Setter TargetName="Arrow" Property="Stroke"      Value="#7C65D8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- ===== Clear Completed Button ===== -->
         <Style x:Key="ClearCompletedButtonStyle" TargetType="Button">
             <Setter Property="Background"      Value="Transparent"/>
@@ -188,6 +320,15 @@
                     <TextBlock x:Name="ReminderCountText"
                                Foreground="{StaticResource SidebarSubText}"
                                FontSize="11" Margin="0,3,0,0"/>
+                    <ComboBox x:Name="FilterComboBox"
+                              Style="{StaticResource FilterComboBoxStyle}"
+                              Margin="0,8,0,0"
+                              SelectionChanged="FilterComboBox_SelectionChanged">
+                        <ComboBoxItem Content="すべて"     IsSelected="True"/>
+                        <ComboBoxItem Content="有効のみ"/>
+                        <ComboBoxItem Content="未完了のみ"/>
+                        <ComboBoxItem Content="期限超過のみ"/>
+                    </ComboBox>
                 </StackPanel>
             </Border>
 
@@ -201,7 +342,8 @@
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <!-- x:Name で Opacity 制御するためルート Grid に名前を付ける -->
+                        <Grid x:Name="ContentGrid">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -219,13 +361,22 @@
                                        FontSize="13"
                                        TextTrimming="CharacterEllipsis"/>
 
-                            <!-- Enabled indicator dot -->
-                            <Ellipse x:Name="StatusDot"
-                                     Grid.Row="0" Grid.Column="1"
-                                     Width="6" Height="6"
-                                     Fill="#4CAF50"
-                                     VerticalAlignment="Center"
-                                     Margin="8,0,2,0"/>
+                            <!-- 状態インジケーター: 通常/無効=ドット、完了=✓ -->
+                            <Grid Grid.Row="0" Grid.Column="1"
+                                  Width="14" VerticalAlignment="Center"
+                                  Margin="6,0,2,0">
+                                <Ellipse x:Name="StatusDot"
+                                         Width="6" Height="6"
+                                         Fill="#4CAF50"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"/>
+                                <TextBlock x:Name="CompletedMark"
+                                           Text="✓" FontSize="9"
+                                           Foreground="#7C65D8"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Visibility="Collapsed"/>
+                            </Grid>
 
                             <!-- Date / time -->
                             <TextBlock x:Name="TimeText"
@@ -236,8 +387,8 @@
                                        Margin="0,3,0,0"/>
                         </Grid>
 
-                        <!-- Disabled state: mute colors -->
                         <DataTemplate.Triggers>
+                            <!-- 無効: テキスト・ドットをミュート -->
                             <DataTrigger Binding="{Binding IsEnabled}" Value="False">
                                 <Setter TargetName="TitleText" Property="Foreground"
                                         Value="{StaticResource CardDisabledText}"/>
@@ -245,6 +396,15 @@
                                         Value="{StaticResource CardDisabledSub}"/>
                                 <Setter TargetName="StatusDot" Property="Fill"
                                         Value="#3A3555"/>
+                            </DataTrigger>
+                            <!-- 完了: 後に宣言するため無効トリガーより優先される -->
+                            <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                <Setter TargetName="ContentGrid"   Property="Opacity"         Value="0.70"/>
+                                <Setter TargetName="TitleText"     Property="Foreground"      Value="#5A5678"/>
+                                <Setter TargetName="TitleText"     Property="TextDecorations" Value="{x:Static TextDecorations.Strikethrough}"/>
+                                <Setter TargetName="TimeText"      Property="Foreground"      Value="#3D3A58"/>
+                                <Setter TargetName="StatusDot"     Property="Visibility"      Value="Collapsed"/>
+                                <Setter TargetName="CompletedMark" Property="Visibility"      Value="Visible"/>
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>

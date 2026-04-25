@@ -15,6 +15,7 @@ namespace TrayReminder.Views;
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
+    private ICollectionView _view = null!;
 
     public MainWindow(ReminderService reminderService)
     {
@@ -23,11 +24,11 @@ public partial class MainWindow : Window
         DataContext = _viewModel;
 
         // ソート：未完了→有効→ReminderTime昇順→タイトル昇順
-        var view = CollectionViewSource.GetDefaultView(_viewModel.Reminders);
-        view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.IsCompleted),  ListSortDirection.Ascending));
-        view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.IsEnabled),    ListSortDirection.Descending));
-        view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.ReminderTime), ListSortDirection.Ascending));
-        view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.Title),        ListSortDirection.Ascending));
+        _view = CollectionViewSource.GetDefaultView(_viewModel.Reminders);
+        _view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.IsCompleted),  ListSortDirection.Ascending));
+        _view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.IsEnabled),    ListSortDirection.Descending));
+        _view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.ReminderTime), ListSortDirection.Ascending));
+        _view.SortDescriptions.Add(new SortDescription(nameof(ReminderItem.Title),        ListSortDirection.Ascending));
 
         _viewModel.Reminders.CollectionChanged += (_, _) => UpdateCountText();
         UpdateCountText();
@@ -49,6 +50,18 @@ public partial class MainWindow : Window
         var dialog = new AddEditDialog { Owner = this };
         if (dialog.ShowDialog() == true)
             _viewModel.AddReminder(dialog.Result);
+    }
+
+    private void FilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_view is null) return;   // InitializeComponent 中の早期発火を無視
+        _view.Filter = FilterComboBox.SelectedIndex switch
+        {
+            1 => o => o is ReminderItem r && r.IsEnabled,
+            2 => o => o is ReminderItem r && !r.IsCompleted,
+            3 => o => o is ReminderItem r && !r.IsCompleted && r.IsEnabled && r.ReminderTime < DateTime.Now,
+            _ => null   // 0: すべて
+        };
     }
 
     private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -128,21 +141,40 @@ public partial class MainWindow : Window
             _                  => "なし"
         };
 
-        if (item.IsEnabled)
-        {
-            DetailEnabled.Text = "● 有効";
-            DetailEnabled.Foreground = Brushes.White;
-            DetailEnabledBadge.Background = new SolidColorBrush(Color.FromRgb(0x38, 0x8A, 0x61));
-        }
-        else
-        {
-            DetailEnabled.Text = "○ 無効";
-            DetailEnabled.Foreground = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x99));
-            DetailEnabledBadge.Background = new SolidColorBrush(Color.FromRgb(0xE0, 0xDD, 0xF0));
-        }
+        SetStatusBadge(item);
 
         var desc = item.Description?.Trim();
         DetailDescription.Text = string.IsNullOrEmpty(desc) ? "（メモなし）" : desc;
+    }
+
+    private void SetStatusBadge(ReminderItem item)
+    {
+        if (item.IsCompleted)
+        {
+            DetailEnabledBadge.Visibility = Visibility.Visible;
+            DetailEnabledBadge.Background = new SolidColorBrush(Color.FromRgb(0xEB, 0xE6, 0xF8));
+            DetailEnabled.Text       = "✓ 完了";
+            DetailEnabled.Foreground = new SolidColorBrush(Color.FromRgb(0x7C, 0x65, 0xD8));
+        }
+        else if (!item.IsEnabled)
+        {
+            DetailEnabledBadge.Visibility = Visibility.Visible;
+            DetailEnabledBadge.Background = new SolidColorBrush(Color.FromRgb(0xE0, 0xDD, 0xF0));
+            DetailEnabled.Text       = "○ 無効";
+            DetailEnabled.Foreground = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x99));
+        }
+        else if (item.ReminderTime < DateTime.Now)
+        {
+            DetailEnabledBadge.Visibility = Visibility.Visible;
+            DetailEnabledBadge.Background = new SolidColorBrush(Color.FromRgb(0xFF, 0xED, 0xCC));
+            DetailEnabled.Text       = "⚠ 期限超過";
+            DetailEnabled.Foreground = new SolidColorBrush(Color.FromRgb(0x95, 0x4E, 0x00));
+        }
+        else
+        {
+            // 通常状態（有効・未来日時・未完了）: バッジ非表示
+            DetailEnabledBadge.Visibility = Visibility.Collapsed;
+        }
     }
 
     private void ClearDetail()
