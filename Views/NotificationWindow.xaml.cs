@@ -6,6 +6,9 @@ namespace TrayReminder.Views;
 
 public partial class NotificationWindow : Window
 {
+    // 表示中の全通知ウィンドウを追跡（積み上げ位置計算用）
+    private static readonly List<NotificationWindow> _openWindows = [];
+
     public event Action<ReminderItem>? Completed;
     public event Action<ReminderItem>? Dismissed;
     public event Action<ReminderItem, TimeSpan>? Snoozed;
@@ -16,11 +19,11 @@ public partial class NotificationWindow : Window
 
     private const int AutoCloseSeconds = 30;
     private const int EdgeMargin = 14;
+    private const int WindowGap = 10;
 
     public NotificationWindow(ReminderItem item)
     {
         InitializeComponent();
-        PositionAtBottomRight();
         _item = item;
         TitleText.Text = item.Title;
         TimeText.Text = item.ReminderTime.ToString("yyyy/MM/dd HH:mm");
@@ -34,16 +37,33 @@ public partial class NotificationWindow : Window
             DescriptionText.Text = item.Description;
         }
 
+        // 現在の表示中リストをもとに右下位置を計算（Show() 前なので自分はまだリスト外）
+        PositionAtBottomRight();
+
+        // Show された後にリストへ追加し、Closed 時に除去する
+        Loaded += (_, _) => _openWindows.Add(this);
+        Closed += (_, _) => _openWindows.Remove(this);
+
         _autoCloseTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(AutoCloseSeconds) };
         _autoCloseTimer.Tick += (_, _) => Dismiss();
         _autoCloseTimer.Start();
     }
 
+    // 表示中ウィンドウの実際の高さを積み上げて Top を決定する
     private void PositionAtBottomRight()
     {
         var workArea = SystemParameters.WorkArea;
+
+        // 下端基準点（余白を引いた位置）から上方向に積み上げる
+        double bottom = workArea.Bottom - EdgeMargin;
+        foreach (var win in _openWindows)
+        {
+            var h = win.ActualHeight > 0 ? win.ActualHeight : win.Height;
+            bottom -= h + WindowGap;
+        }
+
         Left = workArea.Right - Width - EdgeMargin;
-        Top = workArea.Bottom - Height - EdgeMargin;
+        Top  = bottom - Height;
     }
 
     private void CompleteButton_Click(object sender, RoutedEventArgs e)
