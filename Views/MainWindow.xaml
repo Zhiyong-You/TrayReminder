@@ -24,6 +24,40 @@
         <SolidColorBrush x:Key="SnoozeBrush"       Color="#6B6191"/>
         <SolidColorBrush x:Key="DangerBrush"       Color="#C0392B"/>
 
+        <!-- ===== Clear Completed Button ===== -->
+        <Style x:Key="ClearCompletedButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{StaticResource SidebarSubText}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource SidebarDivider}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="0,7"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#8B3A3A"/>
+                                <Setter TargetName="Bd" Property="Background"  Value="#2A1515"/>
+                                <Setter Property="Foreground" Value="#E57373"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#3A1C1C"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- ===== Add Button ===== -->
         <Style x:Key="AddButtonStyle" TargetType="Button">
             <Setter Property="Background"      Value="{StaticResource AccentBrush}"/>
@@ -217,12 +251,16 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <!-- Add button -->
-            <Button Grid.Row="2"
-                    Content="＋  リマインダーを追加"
-                    Margin="12,8,12,12"
-                    Style="{StaticResource AddButtonStyle}"
-                    Click="AddButton_Click"/>
+            <!-- Bottom buttons -->
+            <StackPanel Grid.Row="2" Margin="12,8,12,12">
+                <Button Content="＋  リマインダーを追加"
+                        Margin="0,0,0,6"
+                        Style="{StaticResource AddButtonStyle}"
+                        Click="AddButton_Click"/>
+                <Button Content="完了済みを削除"
+                        Style="{StaticResource ClearCompletedButtonStyle}"
+                        Click="ClearCompletedButton_Click"/>
+            </StackPanel>
         </Grid>
 
         <!-- ================================================ -->

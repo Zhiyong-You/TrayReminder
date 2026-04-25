@@ -70,6 +70,26 @@ public partial class MainWindow : Window
         }
     }
 
+    private void ClearCompletedButton_Click(object sender, RoutedEventArgs e)
+    {
+        var count = _viewModel.Reminders.Count(x => x.IsCompleted);
+        if (count == 0)
+        {
+            MessageBox.Show("完了済みのリマインダーはありません。", "TrayReminder",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var dialog = new ConfirmDeleteDialog(count) { Owner = this };
+        if (dialog.ShowDialog() == true)
+        {
+            var selectedWasCompleted = ReminderList.SelectedItem is ReminderItem sel && sel.IsCompleted;
+            _viewModel.RemoveCompletedReminders();
+            if (selectedWasCompleted)
+                ClearDetail();
+        }
+    }
+
     private void SnoozeButton_Click(object sender, RoutedEventArgs e)
     {
         if (ReminderList.SelectedItem is not ReminderItem selected) return;

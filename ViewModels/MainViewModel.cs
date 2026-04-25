@@ -43,6 +43,12 @@ public class MainViewModel
         Reminders.Remove(item);
     }
 
+    public void RemoveCompletedReminders()
+    {
+        foreach (var item in Reminders.Where(x => x.IsCompleted).ToList())
+            RemoveReminder(item);
+    }
+
     public void SnoozeReminder(ReminderItem item, TimeSpan duration)
     {
         _service.Snooze(item.Id, duration);
