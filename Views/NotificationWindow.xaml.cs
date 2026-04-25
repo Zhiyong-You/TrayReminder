@@ -15,10 +15,12 @@ public partial class NotificationWindow : Window
     private bool _resultHandled;
 
     private const int AutoCloseSeconds = 30;
+    private const int EdgeMargin = 14;
 
     public NotificationWindow(ReminderItem item)
     {
         InitializeComponent();
+        PositionAtBottomRight();
         _item = item;
         TitleText.Text = item.Title;
         TimeText.Text = item.ReminderTime.ToString("yyyy/MM/dd HH:mm");
@@ -35,6 +37,13 @@ public partial class NotificationWindow : Window
         _autoCloseTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(AutoCloseSeconds) };
         _autoCloseTimer.Tick += (_, _) => Dismiss();
         _autoCloseTimer.Start();
+    }
+
+    private void PositionAtBottomRight()
+    {
+        var workArea = SystemParameters.WorkArea;
+        Left = workArea.Right - Width - EdgeMargin;
+        Top = workArea.Bottom - Height - EdgeMargin;
     }
 
     private void CompleteButton_Click(object sender, RoutedEventArgs e)

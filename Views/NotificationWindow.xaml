@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="リマインダー通知"
         Width="340" Height="272"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="Manual"
         Topmost="True"
         ResizeMode="NoResize"
         Background="{StaticResource DialogBg}">
