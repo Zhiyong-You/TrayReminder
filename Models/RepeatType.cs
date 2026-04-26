@@ -5,5 +5,7 @@ public enum RepeatType
     None,
     Daily,
     Weekly,
-    Workday
+    Workday,
+    Monthly,
+    Yearly
 }

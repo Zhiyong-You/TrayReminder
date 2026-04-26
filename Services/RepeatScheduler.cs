@@ -29,10 +29,12 @@ public static class RepeatScheduler
     private static DateTime Advance(DateTime dt, RepeatType repeatType)
         => repeatType switch
         {
-            RepeatType.Daily   => dt.AddDays(1),
-            RepeatType.Weekly  => dt.AddDays(7),
-            RepeatType.Workday => NextWorkday(dt),
-            _                  => dt.AddDays(1)
+            RepeatType.Daily    => dt.AddDays(1),
+            RepeatType.Weekly   => dt.AddDays(7),
+            RepeatType.Workday  => NextWorkday(dt),
+            RepeatType.Monthly  => dt.AddMonths(1),  // 月末は自動クランプ (1/31→2/28等)
+            RepeatType.Yearly   => dt.AddYears(1),   // 2/29は自動クランプ (→2/28)
+            _                   => dt.AddDays(1)
         };
 
     private static DateTime NextWorkday(DateTime dt)

@@ -68,7 +68,21 @@ public class TrayIconService : IDisposable
         menu.Items.Add("主画面を開く",     null, (_, _) => ShowMainWindow());
         menu.Items.Add("新規リマインダー", null, (_, _) => _openNewReminder());
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("終了",             null, (_, _) => _exitApp());
+
+        var startupItem = new ToolStripMenuItem("ログオン時に自動起動")
+        {
+            CheckOnClick = true,
+            Checked      = StartupService.IsEnabled()
+        };
+        startupItem.Click += (_, _) =>
+        {
+            if (startupItem.Checked) StartupService.Enable();
+            else                     StartupService.Disable();
+        };
+        menu.Items.Add(startupItem);
+
+        menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add("終了", null, (_, _) => _exitApp());
         return menu;
     }
 

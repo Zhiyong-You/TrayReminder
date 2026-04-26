@@ -26,7 +26,11 @@ public partial class App : WpfApplication
 
         var mainWindow = new MainWindow(_reminderService);
         _trayIconService = new TrayIconService(mainWindow, OpenQuickAdd, ExitApp, _reminderService);
-        mainWindow.Show();
+
+        // --startup 引数付き（自動起動）のときはウィンドウを表示しない
+        var args = Environment.GetCommandLineArgs();
+        if (!args.Contains("--startup"))
+            mainWindow.Show();
 
         _notificationService.Start();
     }
